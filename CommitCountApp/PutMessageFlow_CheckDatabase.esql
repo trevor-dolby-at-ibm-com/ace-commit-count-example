@@ -1,0 +1,31 @@
+
+
+CREATE COMPUTE MODULE PutMessageFlow_CheckDatabase
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		IF Environment.databaseTableChecked IS NULL THEN
+			 DECLARE EXIT HANDLER FOR SQLSTATE LIKE '%'
+             BEGIN
+            	-- If we end up here, then the table create has failed
+            	-- because we have already created the table in a previous run.
+            	SET Environment.databaseTableChecked = TRUE;
+             END;
+             PASSTHRU('CREATE TABLE TEST(id INTEGER, name VARCHAR(128))');
+             SET Environment.databaseTableChecked = TRUE;
+		END IF;
+		
+		DECLARE rowCount INTEGER 0;
+		
+		SET rowCount = SELECT count(A.id) from Database.TEST AS A;
+		LOG EVENT SEVERITY 4 CATALOG 'BIPmsgs' MESSAGE 8099 VALUES('Row count before message sent', rowCount, '', '');
+		
+		PROPAGATE;
+		
+		SET OutputLocalEnvironment.dumm = SLEEP(250);
+		SET rowCount = SELECT count(A.id) from Database.TEST AS A;
+		LOG EVENT SEVERITY 4 CATALOG 'BIPmsgs' MESSAGE 8099 VALUES('Row count after message sent', rowCount, '', '');
+        
+		RETURN FALSE;
+	END;
+
+END MODULE;

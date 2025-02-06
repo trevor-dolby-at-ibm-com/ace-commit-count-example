@@ -1,0 +1,11 @@
+
+
+CREATE COMPUTE MODULE DatabaseInteractionFlow_Compute
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		LOG EVENT SEVERITY 4 CATALOG 'BIPmsgs' MESSAGE 8099 VALUES('Adding a row to the database table', '', '', '');
+		INSERT INTO Database.TEST(id, name) VALUES(1, 'test');
+		RETURN TRUE;
+	END;
+
+END MODULE;

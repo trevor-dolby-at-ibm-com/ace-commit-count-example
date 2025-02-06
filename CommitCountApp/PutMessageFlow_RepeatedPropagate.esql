@@ -1,0 +1,18 @@
+
+
+CREATE COMPUTE MODULE PutMessageFlow_RepeatedPropagate
+	CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+
+		LOG EVENT SEVERITY 4 CATALOG 'BIPmsgs' MESSAGE 8099 VALUES('Starting propagate loop', '', '', '');
+		
+        DECLARE propagateCount INTEGER 0;
+        WHILE propagateCount < 10 DO
+        	PROPAGATE;
+        	SET propagateCount = propagateCount + 1;
+        END WHILE;
+        	
+		RETURN FALSE;
+	END;
+
+END MODULE;
